@@ -142,3 +142,14 @@ p(y^{(i)}=1|x^{(i)}) &=\dfrac{p(y^{(i)}=1,x^{(i)},t^{(i)}=1)}{p(x^{(i)})} \\
 \end{aligned}
 $$
 
+### (c)
+
+<img src="./src/output/p02c.png" style="zoom:67%;" />
+
+### (d)
+
+<img src="./src/output/p02d.png" style="zoom:67%;" />
+
+### (e)
+
+<img src="./src/output/p02e.png" style="zoom:67%;" />
