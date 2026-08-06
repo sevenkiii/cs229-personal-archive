@@ -153,3 +153,37 @@ $$
 ### (e)
 
 <img src="./src/output/p02e.png" style="zoom:67%;" />
+
+## Prb.3
+
+### (a)
+
+$$
+p(y;\lambda) = \dfrac{\exp(y\ln \lambda-\lambda)}{y!}\\
+b(y) = \dfrac{1}{y!}\\
+\eta = \ln \lambda\\
+T(y) = y\\
+a(\eta) =  \lambda = e^{\eta}
+$$
+
+### (b)
+
+$$
+g(\eta) = E[y;\eta] = \lambda = \exp(\eta)
+$$
+
+### (c)
+
+$$
+\begin{aligned}
+\ell(\theta)= \log p (y^{(i)}|x^{(i)};\theta) &= \log \exp(y^{(i)}\ln e^{\theta^Tx^{(i)}}-e^{\theta^Tx^{(i)}}) - \log y^{(i)}!\\
+&=y^{(i)}{\theta^Tx^{(i)}}-e^{\theta^Tx^{(i)}} - \log y^{(i)}!\\
+
+\dfrac{\partial\ell(\theta)}{\partial \theta_j} &= x_j^{(i)}(y^{(i)}-e^{\theta^Tx^{(i)}})
+\end{aligned}
+$$
+
+$$
+\theta := \theta + \alpha(y^{(i)}-e^{\theta^Tx^{(i)}})x^{(i)}\ \ \ \ \text{for } i\in\{1,2,\cdots,m\}
+$$
+
