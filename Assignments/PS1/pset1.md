@@ -233,3 +233,55 @@ $$
 
 since $a''(\theta^Tx)=a''(\eta)=\mathrm{Var}(Y|X;\theta) \ge 0 $, we have $z^THz\ge 0$, $H$ is PSD, so NLL is convex.
 
+## Prb. 5
+
+### (a)
+
+#### i
+
+$$
+W_{ij}= \left\{ 
+\begin{aligned}
+0 && i\neq j\\
+\frac 1 2 w^{(i)} && i=j\\
+\end{aligned}
+\right.
+$$
+
+#### ii
+
+$$
+\begin{aligned}
+\grad_\theta J(\theta) &= \grad_\theta(X\theta-y)^TW(X\theta-y)\\
+&=\grad_\theta[\theta^TX^TWX\theta - \theta^TX^TWy - y^TWX\theta + y^TWy]\\
+&= 2X^TWX\theta - 2X^TWy \\
+X^TWX\theta &= X^TWy\\
+\theta &= (X^TWX)^{-1}X^TWy
+\end{aligned}
+$$
+
+#### iii
+
+$$
+\begin{aligned}
+L(\theta) &= \prod_{i=1}^m{\dfrac{1}{\sqrt{2\pi}\sigma^{(i)}}}\exp\left( -\dfrac{(y^{(i)}-\theta^Tx^{(i)})^2}{2(\sigma^{(i)})^2}\right) \\
+\ell(\theta) &= \sum_{i=1}^m  -\dfrac{(y^{(i)}-\theta^Tx^{(i)})^2}{2(\sigma^{(i)})^2}-\log \sqrt{2\pi}\sigma^{(i)}\\
+\end{aligned}
+$$
+
+maximize $\ell (\theta)$ is equivalent to minimize $\sum  w_i(y^{(i)}-\theta^Tx^{(i)})^2$ where $w_i = \dfrac{1}{2(\sigma^{(i)})^2}$, a weighted linear regression problem.
+
+### (b)
+
+<img src="./src/output/p05b.png" style="zoom:67%;" />
+
+underfitting.
+
+### (c)
+
+<img src="./src/output/p05c_tau_10.0.png" style="zoom:67%;" />
+<img src="./src/output/p05c_tau_1.0.png" style="zoom:67%;" />
+<img src="./src/output/p05c_tau_0.5.png" style="zoom:67%;" />
+<img src="./src/output/p05c_tau_0.1.png" style="zoom:67%;" />
+<img src="./src/output/p05c_tau_0.05.png" style="zoom:67%;" />
+<img src="./src/output/p05c_tau_0.03.png" style="zoom:67%;" />
