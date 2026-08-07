@@ -187,3 +187,49 @@ $$
 \theta := \theta + \alpha(y^{(i)}-e^{\theta^Tx^{(i)}})x^{(i)}\ \ \ \ \text{for } i\in\{1,2,\cdots,m\}
 $$
 
+## Prb.4
+
+### (a)
+
+$$
+\begin{aligned}
+\int_Db(y)\exp(\eta y − a(\eta)) \mathrm{d} y &= 1 \\
+\int_Db(y)\exp(\eta y)\mathrm{d}y &= \exp(a(\eta)) \\
+\dfrac{\partial}{\partial \eta}\int_Db(y)\exp(\eta y)\mathrm{d}y &= a'(\eta)\exp(a(\eta))\\
+\int_D\dfrac{\partial}{\partial \eta}b(y)\exp(\eta y)\mathrm{d}y &= a'(\eta)\exp(a(\eta))\\
+\int_D yb(y)\exp(\eta y)\mathrm{d}y &= a'(\eta)\exp(a(\eta))\\
+\int_D yb(y)\exp(\eta y - a(\eta))\mathrm{d}y &= a'(\eta)\\
+\mathbb{E}[Y|X;\theta] &= a'(\eta)
+\end{aligned}
+$$
+
+### (b)
+
+$$
+\begin{aligned}
+\int_D yb(y)\exp(\eta y - a(\eta))\mathrm{d}y &= a'(\eta)\\
+\int_D \dfrac{\partial}{\partial \eta}yb(y)\exp(\eta y - a(\eta))\mathrm{d}y &= a''(\eta)\\
+\int_D yb(y)\times(y-a'(\eta))\exp(\eta y - a(\eta))\mathrm{d}y &= a''(\eta)\\
+\int_D (y-a'(\eta))b(y)\times(y-a'(\eta))\exp(\eta y - a(\eta))\mathrm{d}y \ +\\ 
+a'(\eta) \left(a'(\eta)-\int_D b(y)\times a'(\eta)\exp(\eta y - a(\eta))\mathrm{d}y\right)&=a''(\eta) \\
+\int_D (y-a'(\eta))^2b(y)\exp(\eta y - a(\eta))\mathrm{d}y \ &=a''(\eta)\\
+\mathrm{Var}(Y|X;\theta) &= a''(\eta)
+\end{aligned}
+$$
+
+### (c)
+
+$$
+\begin{aligned}
+L(\theta)=\prod_{k=1}^m  p(y^{(k)}|x^{(k)};\theta) &= \prod_{k=1}^mb(y^{(k)})\exp\left(\theta^Tx^{(k)}y^{(k)} - a(\theta^Tx^{(k)})\right)\\
+-\ell (\theta) &= \sum_{k=1}^m a(\theta^Tx^{(k)})-\theta^Tx^{(k)}y^{(k)}+\log b(y^{(k)})\\
+\dfrac{\partial}{\partial\theta_i}[-\ell (\theta)] &= \sum_{k=1}^m \left(a'(\theta^Tx^{(k)})x^{(k)}_i - x^{(k)}_iy^{(k)}\right)\\
+H_{ij}=\dfrac{\partial^2}{\partial\theta_i\partial\theta_j}[-\ell (\theta)] &= \sum_{k=1}^m a''(\theta^Tx^{(k)})x^{(k)}_ix^{(k)}_j \\
+z^THz &= \sum_{k=1}^m\sum_{i=1}^n\sum_{j=1}^n a''(\theta^Tx^{(k)})x^{(k)}_ix^{(k)}_j z_iz_j\\
+z^THz &= \sum_{k=1}^ma''(\theta^Tx^{(k)})\sum_{i=1}^n\sum_{j=1}^n (x^{(k)}_i z_i)(x^{(k)}_jz_j)\\
+z^THz &= \sum_{k=1}^ma''(\theta^Tx^{(k)})(x^{(k)T}z)^2
+\end{aligned}
+$$
+
+since $a''(\theta^Tx)=a''(\eta)=\mathrm{Var}(Y|X;\theta) \ge 0 $, we have $z^THz\ge 0$, $H$ is PSD, so NLL is convex.
+
