@@ -44,6 +44,141 @@ not vulnerable. the hinge loss can go to zero.
 
 B is linearly separable. and geometric margin don't change when we just change $||\theta||$
 
+## Prb. 2
+
+### (a)
+
+(0,1) including all training set
+
+after MLE, we have
+
+(in the intercept term all x give 1.)
+$$
+\begin{aligned}
+\dfrac{\partial}{\partial\theta_j}\ell(\theta) = \sum_{i=1}^m(y^{(i)}-g(\theta^Tx^{(i)}))x_j^{(i)}&=0\\
+\sum_{i=1}^my^{(i)}x_0^{(i)} &= \sum_{i=1}^mg(\theta^Tx^{(i)})x_0^{(i)}\\
+\sum_{i=1}^my^{(i)}&=\sum_{i=1}^mg(\theta^Tx^{(i)})\\
+\frac{\sum_{i\in I_{a,b}}\mathbb{I}\{y^{(i)}=1\}}{\vert{}\{i\in I_{a,b}\}\vert{}}&=\frac{\sum_{i\in I_{a,b}}P(y^{(i)}=1\vert{}x^{(i)};\theta)}{\vert{}\{i\in I_{a,b}\}\vert{}}
+\end{aligned}
+$$
+
+### (b)
+
+~~both yes.~~
+
+~~in fact, the assumption of GLM holds, and Bernoulli is in Exponential Family, so when the property holds, the model just fit the Bernoulli distribution exactly, leading to perfect accuracy. The converse is also true, as perfect accuracy leads to MLE, MLE leads to fit the Bernoulli exactly.~~
+
+**both NO**
+
+when $(a,b) = (0.5,1)$, all predictions are "1". however
+$$
+\frac{\sum_{i\in I_{a,b}}\mathbb{I}\{y^{(i)}=1\}}{\vert{}\{i\in I_{a,b}\}\vert{}}=\frac{\sum_{i\in I_{a,b}}P(y^{(i)}=1\vert{}x^{(i)};\theta)}{\vert{}\{i\in I_{a,b}\}\vert{}}<1
+$$
+that is, perfect accuracy can't be achieved.
+
+In the same way, the converse, though achieves perfect accuracy, we have  
+
+$$
+\frac{\sum_{i\in I_{a,b}}P(y^{(i)}=1\vert{}x^{(i)};\theta)}{\vert{}\{i\in I_{a,b}\}\vert{}}<1=\frac{\sum_{i\in I_{a,b}}\mathbb{I}\{y^{(i)}=1\}}{\vert{}\{i\in I_{a,b}\}\vert{}}
+$$
+
+so the converse is wrong.
+
+// 原来 perfect accuracy 是全对的意思啊......
+
+### (c)
+
+including regularization can lead to lower Var and higher Bias. That is, it will not MLE, leading to not fitting the Bernoulli exactly. (Or, it modifies the loss function so that the likelihood won't be maximized, give way to L2 norm.) therefore, there will be some error on model calibration. 
+$$
+\begin{aligned}
+\dfrac{\partial}{\partial\theta_j}\ell(\theta) = \lambda\theta_j+\sum_{i=1}^m(y^{(i)}-g(\theta^Tx^{(i)}))x_j^{(i)} &=0\\
+\lambda\theta_j+\sum_{i=1}^my^{(i)}x_0^{(i)} &= \sum_{i=1}^mg(\theta^Tx^{(i)})x_0^{(i)}\\
+\lambda\theta_j+\sum_{i=1}^my^{(i)}&=\sum_{i=1}^mg(\theta^Tx^{(i)})\\
+\lambda\theta_j+\sum_{i\in I_{a,b}}\mathbb{I}\{y^{(i)}=1\}&=\sum_{i\in I_{a,b}}P(y^{(i)}=1\vert{}x^{(i)};\theta)
+\end{aligned}
+$$
+
+
+## Prb. 3
+
+### (a)
+
+$$
+\begin{aligned}
+\theta_{\mathrm{MAP}} &= \arg \max_\theta p(\theta | x,y)\\
+&=\arg \max_\theta \dfrac{p(x,y|\theta)p(\theta)}{p(x,y)}\\
+&=\arg \max_\theta \dfrac{p(y|x,\theta)p(x|\theta)p(\theta)}{p(x,y)}\\
+&=\arg \max_\theta \dfrac{p(y|x,\theta)p(x)p(\theta)}{p(x,y)}\\
+&=\arg \max_\theta p(y|x,\theta)p(\theta)
+\end{aligned}
+$$
+
+### (b)
+
+$$
+\begin{aligned}
+\theta_{\mathrm{MAP}}&=\arg \max_\theta p(y|x,\theta)p(\theta)\\
+&= \arg \max_\theta p(y|x,\theta)\dfrac{1}{(2\pi)^{d/2}|\eta^2I|^{1/2}}\exp\left(-\frac{1}{2}\theta^T(\eta^2I)^{-1}\theta\right)\\
+&= \arg \max_\theta p(y|x,\theta)\dfrac{1}{(2\pi)^{d/2}\eta^{d}}\exp\left(-\frac{1}{2\eta^2}\theta^T\theta\right)\\
+&= \arg \max_\theta p(y|x,\theta)\exp\left(-\frac{1}{2\eta^2}||\theta||_2^2\right)\\
+&= \arg \min_\theta -\log p(y|x,\theta) +\frac{1}{2\eta^2}||\theta||_2^2\\
+\lambda &= \dfrac{1}{2\eta^2}
+\end{aligned}
+$$
+
+### (c)
+
+$$
+\begin{aligned}
+\theta_{\mathrm{MAP}}&= \arg \min_\theta -\log p(y|x,\theta) +\frac{1}{2\eta^2}||\theta||_2^2\\
+&= \arg \min_\theta -\log \left(\frac{1}{\sqrt{2\pi}\sigma}\exp\left(-\dfrac{(y-\theta^Tx)^2}{2\sigma^2}\right)\right) +\frac{1}{2\eta^2}||\theta||_2^2\\
+&= \arg \min_\theta \dfrac{(y-\theta^Tx)^2}{2\sigma^2}-\log \frac{1}{\sqrt{2\pi}\sigma} +\frac{1}{2\eta^2}||\theta||_2^2\\
+&= \arg \min_\theta \dfrac{(y-\theta^Tx)^2}{2\sigma^2} +\frac{||\theta||_2^2}{2\eta^2}
+\end{aligned}
+$$
+
+now consider the training examples.
+$$
+\begin{aligned}
+\theta_{\mathrm{MAP}}&= \arg \min_\theta \dfrac{(\vec{y}-X\theta)^T(\vec{y}-X\theta)}{2\sigma^2} +\frac{\theta^T\theta}{2\eta^2}\\
+\ell(\theta):&=\dfrac{(\vec{y}-X\theta)^T(\vec{y}-X\theta)}{2\sigma^2} +\frac{\theta^T\theta}{2\eta^2}\\
+\grad_\theta\ell(\theta)&=\dfrac{1}{2\sigma^2}\grad_\theta\left(\vec{y}^T\vec{y} -\theta^TX^T\vec{y}-\vec{y}^TX\theta+\theta^TX^TX\theta\right) + \dfrac{\theta}{\eta^2}\\
+
+&=\dfrac{1}{2\sigma^2}\grad_\theta\left( -2\theta^TX^T\vec{y}+\theta^TX^TX\theta\right) + \dfrac{\theta}{\eta^2}\\
+&=\dfrac{-2X^T\vec{y} + 2X^TX\theta }{2\sigma^2}+ \dfrac{\theta}{\eta^2}\\
+&=\dfrac{ X^TX\theta -X^T\vec{y}}{\sigma^2}+ \dfrac{\theta}{\eta^2}
+\end{aligned}
+$$
+set grad to zero:
+$$
+\begin{aligned}
+\dfrac{ X^TX\theta -X^T\vec{y}}{\sigma^2}+ \dfrac{\theta}{\eta^2}&=0\\
+(X^TX\theta -X^T\vec{y}) + \dfrac{\sigma^2\theta}{\eta^2} &= 0\\
+(X^TX +\dfrac{\sigma^2}{\eta^2}I) \theta &= X^T\vec{y}\\
+\theta_{\mathrm{MAP}} &= \left(X^TX +\dfrac{\sigma^2}{\eta^2}I\right)^{-1}X^T\vec{y}
+\end{aligned}
+$$
+
+### (d)
+
+$$
+\begin{aligned}
+\theta_{\mathrm{MAP}}&=\arg \max_\theta p(y|x,\theta)p(\theta)\\
+&=\arg \max_\theta p(y|x,\theta)\prod_j \dfrac{1}{2b}\exp({-\frac{|\theta_j|}{b}})\\
+&=\arg \max_\theta \log p(y|x,\theta) + \sum_j -\frac{|\theta_j|}{b}+\log \frac{1}{2b}\\
+&=\arg \min_\theta -\log p(y|x,\theta) +\dfrac{1}{b}||\theta||_1\\
+&=\arg \min_\theta \dfrac{(y-\theta^Tx)^2}{2\sigma^2} +\dfrac{1}{b}||\theta||_1\\
+&=\arg \min_\theta \ (y-\theta^Tx)^2 +\dfrac{2\sigma^2}{b}||\theta||_1\\
+\end{aligned}
+$$
+
+in matrix form we have
+$$
+J(\theta) = ||X\theta-\vec{y}||_2^2 +\dfrac{2\sigma^2}{b}||\theta||_1\\
+\gamma = \dfrac{2\sigma^2}{b}\\
+\theta_{\mathrm{MAP}} = \arg \min_\theta J(\theta)
+$$
+
 ## Prb. 4
 
 $$
