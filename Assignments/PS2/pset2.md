@@ -269,3 +269,49 @@ $$
 for u=0, we know that $\sum_{i=1}^n\sum_{j=1}^n z_iz_j = (\sum_{i=1}^nz_i)^2\ge0$
 
 since $a_u>0$, $z^TKz\ge 0$
+
+## Prb. 5
+
+### (a)
+
+i.
+
+note $\langle x,z\rangle = x^Tz$
+
+assume that
+$$
+\theta^{(i)}=\sum_{j=1}^i\lambda_j \phi(x^{(j)})
+$$
+
+$$
+\begin{aligned}
+\theta^{(i+1)}:&=\sum_{j=1}^i\lambda_j\phi(x^{(j)}) + \alpha\left(y^{(i+1)}-g\left(\sum_{j=1}^i\lambda_j\phi(x^{(j)})^T\phi(x^{(i+1)})\right)\right)\phi(x^{(i+1)})\\
+&=\sum_{j=1}^i\lambda_j\phi(x^{(j)}) + \alpha\left(y^{(i+1)}-g\left(\sum_{j=1}^i\lambda_jK(x^{(j)},x^{(i+1)})\right)\right)\phi(x^{(i+1)})\\
+\end{aligned}
+$$
+
+by induction we know the assumption is correct, and 
+$$
+\lambda_{i+1} = \alpha\left(y^{(i+1)}-g\left(\sum_{j=1}^i\lambda_jK(x^{(j)},x^{(i+1)})\right)\right)
+$$
+we can use lambda to represent theta implicitly. $\theta^{(i)}=\sum_{j=1}^i\lambda_j\phi(x_j)$, specifically $\theta^{(0)}=0$ with all the lambda is initial zero.
+
+ii.
+
+$$
+\begin{aligned}
+h_{\theta^{(i)}}(x^{(i+1)}) &= g(\theta^{(i)^T}\phi(x^{(i+1)}))\\
+&= g\left(\sum_{j=1}^i\lambda_j \phi(x^{(j)})^T\phi(x^{(i+1)})\right)\\
+&= g\left(\sum_{j=1}^i\lambda_j K(x^{(j)},x^{(i+1)})\right)
+
+\end{aligned}
+$$
+iii. has been shown above.
+
+### (c)
+
+dot product kernel.
+
+using dot product as a kernel gives a $\phi(x)=x$, so the perceptron can only give a linear decision boundary.
+
+//note: the code in util.py mistakes `y == 0` as `y == -1`
