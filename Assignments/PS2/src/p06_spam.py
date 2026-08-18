@@ -21,7 +21,7 @@ def get_words(message):
     """
 
     # *** START CODE HERE ***
-    return message.strip().lower().split(' ')
+    return message.strip().lower().split()
     # *** END CODE HERE ***
 
 
@@ -137,11 +137,11 @@ def predict_from_naive_bayes_model(model, matrix):
     predict = np.zeros(matrix.shape[0])
     for i in range(matrix.shape[0]):
         nume_log = np.log(phi_y)
-        for j in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
             nume_log += matrix[i][j] * np.log(phi_k[1][j])
             
         deno_log = np.log(1 - phi_y)
-        for j in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
             deno_log += matrix[i][j] * np.log(phi_k[0][j])
         predict[i] = int(nume_log >= deno_log)
     return predict
@@ -189,7 +189,7 @@ def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, 
     """
     # *** START CODE HERE ***
     now = 0
-    best_rad = 0
+    best_rad = radius_to_consider[0]
     for radius in radius_to_consider:
         predict = svm.train_and_predict_svm(train_matrix, train_labels, val_matrix, radius)
         acc = np.mean(predict == val_labels)
