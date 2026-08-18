@@ -21,6 +21,7 @@ def get_words(message):
     """
 
     # *** START CODE HERE ***
+    return message.strip().lower().split(' ')
     # *** END CODE HERE ***
 
 
@@ -41,6 +42,18 @@ def create_dictionary(messages):
     """
 
     # *** START CODE HERE ***
+    count = collections.OrderedDict()
+    for message in messages:
+        words = set(get_words(message))
+        for word in words:
+            count[word] = count.get(word, 0) + 1
+    ord = 0
+    dictionary = collections.OrderedDict()
+    for word, cnt in count.items():
+        if cnt >= 5:
+            dictionary[word] = ord
+            ord += 1
+    return dictionary
     # *** END CODE HERE ***
 
 
@@ -62,6 +75,15 @@ def transform_text(messages, word_dictionary):
         A numpy array marking the words present in each message.
     """
     # *** START CODE HERE ***
+    res = np.zeros((len(messages), len(word_dictionary)))
+    now_row = 0
+    for message in messages:
+        words = get_words(message)
+        for word in words:
+            if word in word_dictionary:
+                res[now_row][word_dictionary[word]] += 1
+        now_row += 1
+    return res
     # *** END CODE HERE ***
 
 
@@ -82,6 +104,19 @@ def fit_naive_bayes_model(matrix, labels):
     """
 
     # *** START CODE HERE ***
+    n, m = matrix.shape
+    phi_y = np.mean(labels)
+    phi_k = [np.zeros(m), np.zeros(m)]
+    count = [0,0]
+    
+    for i in range(n):
+        phi_k[labels[i]] += matrix[i]
+        count[labels[i]] += np.sum(matrix[i])
+
+    phi_k[0] = (1 + phi_k[0]) / (count[0] + m)
+    phi_k[1] = (1 + phi_k[1]) / (count[1] + m)
+
+    return phi_k, phi_y
     # *** END CODE HERE ***
 
 
@@ -98,6 +133,18 @@ def predict_from_naive_bayes_model(model, matrix):
     Returns: A numpy array containg the predictions from the model
     """
     # *** START CODE HERE ***
+    phi_k, phi_y = model
+    predict = np.zeros(matrix.shape[0])
+    for i in range(matrix.shape[0]):
+        nume_log = np.log(phi_y)
+        for j in range(matrix.shape[0]):
+            nume_log += matrix[i][j] * np.log(phi_k[1][j])
+            
+        deno_log = np.log(1 - phi_y)
+        for j in range(matrix.shape[0]):
+            deno_log += matrix[i][j] * np.log(phi_k[0][j])
+        predict[i] = int(nume_log >= deno_log)
+    return predict
     # *** END CODE HERE ***
 
 
@@ -114,6 +161,13 @@ def get_top_five_naive_bayes_words(model, dictionary):
     Returns: The top five most indicative words in sorted order with the most indicative first
     """
     # *** START CODE HERE ***
+    phi_k, phi_y = model
+    rnk = []
+    for word, num in dictionary.items():
+        rate = np.log(phi_k[1][num]) - np.log(phi_k[0][num])
+        rnk.append((rate, word))
+    top5_rate_and_word = sorted(rnk, reverse=True)[:5]
+    return [x[1] for x in top5_rate_and_word]
     # *** END CODE HERE ***
 
 
@@ -134,6 +188,15 @@ def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, 
         The best radius which maximizes SVM accuracy.
     """
     # *** START CODE HERE ***
+    now = 0
+    best_rad = 0
+    for radius in radius_to_consider:
+        predict = svm.train_and_predict_svm(train_matrix, train_labels, val_matrix, radius)
+        acc = np.mean(predict == val_labels)
+        if acc > now:
+            now = acc
+            best_rad = radius
+    return best_rad
     # *** END CODE HERE ***
 
 

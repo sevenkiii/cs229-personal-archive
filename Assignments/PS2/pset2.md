@@ -315,3 +315,14 @@ dot product kernel.
 using dot product as a kernel gives a $\phi(x)=x$, so the perceptron can only give a linear decision boundary.
 
 //note: the code in util.py mistakes `y == 0` as `y == -1`
+
+### Prb. 6
+
+```cpp
+(cs229) D:\CSFiles\cs229\cs229-2018-autumn-main\problem-sets\PS2\src>python p06_spam.py
+Naive Bayes had an accuracy of 0.9713261648745519 on the testing set
+The top 5 indicative words for Naive Bayes are:  ['claim', 'won', 'prize', 'tone', 'urgent!']
+The optimal SVM radius was 0.1
+The SVM model had an accuracy of 0.9695340501792115 on the testing set
+```
+
