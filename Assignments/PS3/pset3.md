@@ -314,5 +314,154 @@ $$
 $$
  they have the same update direction.
 
-## Problem 4.
+## Problem 4
 
+### (a)
+
+$$
+\begin{aligned}
+\ell_{\text{semi-sup}}(\theta^{(t+1)}) &= \sum_i \mathrm{ELBO}(x^{(i)};Q_i^{(t+1)},\theta^{(t+1)}) +\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta^{(t+1)})\right)\\
+&\ge  \sum_i \mathrm{ELBO}(x^{(i)};Q_i^{(t)},\theta^{(t+1)}) +\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta^{(t+1)})\right)\\
+&\ge \sum_i \mathrm{ELBO}(x^{(i)};Q_i^{(t)},\theta^{(t)}) +\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta^{(t)})\right)\\
+&= \ell_{\text{semi-sup}}(\theta^{(t)})
+\end{aligned}
+$$
+
+the last $\ge$ is because 
+$$
+\theta^{(t+1)}:=\arg \max_\theta \left[ \sum_i \mathrm{ELBO}(x^{(i)};Q_i^{(t)},\theta) +\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta)\right)\right]
+$$
+
+### (b)
+
+$$
+\begin{aligned}
+w_j^{(i)} &= Q_i(z^{(i)}=j)=P(z^{(i)}=j|x^{(i)};\phi,\mu,\Sigma)\\
+&= \dfrac{P(x^{(i)}|z^{(i)}=j;\mu,\Sigma)P(z^{(i)}=j;\phi)}{\sum_{u=1}^k P(x^{(i)}|z^{(i)}=u;\mu,\Sigma)P(z^{(i)}=u;\phi)}\\
+&= \dfrac{\frac{1}{(2\pi)^{d/2}|\Sigma_j|^{1/2}}\exp\left(-\frac{1}{2}(x^{(i)}-\mu_j)^T\Sigma^{-1}_j(x^{(i)}-\mu_j)\right)\phi_j}{\sum_{u=1}^k \frac{1}{(2\pi)^{d/2}|\Sigma_u|^{1/2}}\exp\left(-\frac{1}{2}(x^{(i)}-\mu_u)^T\Sigma^{-1}_u(x^{(i)}-\mu_u)\right)\phi_u}\\
+&= \dfrac{\frac{1}{|\Sigma_j|^{1/2}}\exp\left(-\frac{1}{2}(x^{(i)}-\mu_j)^T\Sigma^{-1}_j(x^{(i)}-\mu_j)\right)\phi_j}{\sum_{u=1}^k \frac{1}{|\Sigma_u|^{1/2}}\exp\left(-\frac{1}{2}(x^{(i)}-\mu_u)^T\Sigma^{-1}_u(x^{(i)}-\mu_u)\right)\phi_u}
+\end{aligned}
+$$
+
+### (c)
+
+in M-Step, we should maximize:
+$$
+\ell_{\text{semi-sup}}(\theta^{(t+1)}) = \sum_i^m \sum_{j=1}^k w_j^{(i)} \log \frac{\frac{1}{(2\pi)^{d/2}\vert{}\Sigma_j\vert{}^{1/2}} \exp(-\frac{1}{2}(x^{(i)} - \mu_j)^T \Sigma_j^{-1} (x^{(i)} - \mu_j)) \cdot \phi_j}{w_j^{(i)}}+\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta^{(t+1)})\right)
+$$
+and we know
+$$
+\begin{aligned}
+\alpha\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)},\tilde z^{(i)};\theta^{(t+1)}) &= \alpha\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)}|\tilde z^{(i)};\theta^{(t+1)})\phi_{\tilde z^{(i)}}\\
+&= \alpha\sum_{i=1}^{\tilde m} \log\phi_{\tilde z^{(i)}}+\log \frac{1}{(2\pi)^{d/2}|\Sigma_{\tilde z^{(i)}}|^{1/2}}\exp\left(-\frac{1}{2}(\tilde x^{(i)}-\mu_{\tilde z^{(i)}})^T\Sigma^{-1}_{\tilde z^{(i)}}(\tilde x^{(i)}-\mu_{\tilde z^{(i)}})\right)\\
+&= \alpha\sum_{i=1}^{\tilde m} \log\phi_{\tilde z^{(i)}} +\log \frac{1}{(2\pi)^{d/2}|\Sigma_{\tilde z^{(i)}}|^{1/2}}+\left(-\frac{1}{2}(\tilde x^{(i)}-\mu_{\tilde z^{(i)}})^T\Sigma^{-1}_{\tilde z^{(i)}}(\tilde x^{(i)}-\mu_{\tilde z^{(i)}})\right)
+\end{aligned}
+$$
+
+
+
+
+for $\mu$:
+$$
+\begin{aligned}
+\nabla_{\mu_l}\ell_{\text{semi-sup}}(\theta) &= \sum_{i=1}^m w_l^{(i)} (\Sigma^{-1}_l x^{(i)} -\Sigma^{-1}_l\mu_l) + \nabla_{\mu_l}\alpha\left(\sum_{i=1}^{\tilde m} \log p(\tilde x^{(i)}|\tilde z^{(i)};\theta)\phi_{\tilde z^{(i)}}\right)\\
+&= \sum_{i=1}^m w_l^{(i)} (\Sigma^{-1}_l x^{(i)} -\Sigma^{-1}_l\mu_l) + \alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}(\Sigma^{-1}_l x^{(i)} -\Sigma^{-1}_l\mu_l)
+\end{aligned}
+$$
+set it to zero:
+$$
+\begin{aligned}
+\sum_{i=1}^m w_l^{(i)} \Sigma^{-1}_l x^{(i)} + \alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}\Sigma^{-1}_l x^{(i)} &= \sum_{i=1}^m w_l^{(i)}\Sigma^{-1}_l\mu_l +\alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}\Sigma^{-1}_l\mu_l\\
+&= \mu_l\left(\sum_{i=1}^m w_l^{(i)}\Sigma^{-1}_l +\alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}\Sigma^{-1}_l\right)\\
+\mu_l &= \dfrac{\sum_{i=1}^m w_l^{(i)} \Sigma^{-1}_l x^{(i)} + \alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}\Sigma^{-1}_l \tilde x^{(i)}}{\sum_{i=1}^m w_l^{(i)}\Sigma^{-1}_l +\alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}\Sigma^{-1}_l}\\
+&= \dfrac{\sum_{i=1}^m w_l^{(i)}  x^{(i)} + \alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\} \tilde x^{(i)}}{\sum_{i=1}^m w_l^{(i)} +\alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}}
+\end{aligned}
+$$
+
+
+for $\phi$, find those related, we should maximize
+$$
+\begin{aligned}
+\sum_{i=1}^m\sum_{j=1}^k w_j^{(i)}\log \phi_j + \alpha\sum_{i=1}^{\tilde m}\sum_{j=1}^k1\{\tilde z^{(i)}=j\} \log\phi_{j}
+\end{aligned}
+$$
+subject to
+$$
+\sum_{j=1}^k \phi_j = 1
+$$
+construct Langrange:
+$$
+\mathcal L (\phi,\lambda) = \sum_{i=1}^m\sum_{j=1}^k w_j^{(i)}\log \phi_j + \alpha\sum_{i=1}^{\tilde m}\sum_{j=1}^k1\{\tilde z^{(i)}=j\} \log\phi_{j} + \lambda\left(\sum_{j=1}^k \phi_j-1\right)
+$$
+
+$$
+\begin{aligned}
+\dfrac{\partial}{\partial\phi_j}\mathcal L (\phi,\lambda) = \sum_{i=1}^m\frac{w_j^{(i)}}{\phi_j}  +\alpha\sum_{i=1}^{\tilde m} \dfrac{1\{\tilde z^{(i)}=j\}}{\phi_{j}}+ \lambda
+\end{aligned}
+$$
+
+set to zero:
+$$
+\begin{aligned}
+\phi_j = \dfrac{1}{\lambda}\left(\sum_{i=1}^m{w_j^{(i)}}  +\alpha\sum_{i=1}^{\tilde m} {1\{\tilde z^{(i)}=j\}}\right)
+\end{aligned}
+$$
+by $\sum_j \phi_j = 1$:
+$$
+\begin{aligned}
+\lambda = (m+\alpha\tilde m)
+\end{aligned}
+$$
+we have
+$$
+\phi_j = \dfrac{1}{m+\alpha\tilde m}\left(\sum_{i=1}^m{w_j^{(i)}}  +\alpha\sum_{i=1}^{\tilde m} {1\{\tilde z^{(i)}=j\}}\right)
+$$
+
+
+for $\Sigma$, we have
+$$
+\begin{aligned}
+t(l,x^{(i)})&:=\frac{1}{(2\pi)^{d/2}\vert{}\Sigma_l\vert{}^{1/2}} \exp\left(-\frac{1}{2}(x^{(i)} - \mu_l)^T \Sigma_l^{-1} (x^{(i)} - \mu_l)\right) \cdot \phi_l\\
+\nabla_{\Sigma_l}\ell_{\text{semi-sup}}(\theta) &=\sum_{i=1}^m  w_l^{(i)} \left( -\dfrac{1}{2}\Sigma_l^{-1}  +\frac{1}{2}\Sigma_l^{-1}(x^{(i)} - \mu_l)(x^{(i)} - \mu_l)^T\Sigma_l^{-1}\right) + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} \left( -\dfrac{1}{2}\Sigma_l^{-1}  +\frac{1}{2}\Sigma_l^{-1}(\tilde x^{(i)} - \mu_l)(\tilde x^{(i)} - \mu_l)^T\Sigma_l^{-1}\right)
+\end{aligned}
+$$
+set to zero:
+$$
+\begin{aligned}
+\sum_{i=1}^m  w_l^{(i)}  + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} 
+&=
+\sum_{i=1}^m  w_l^{(i)} \left(  (x^{(i)} - \mu_l)(x^{(i)} - \mu_l)^T\Sigma_l^{-1}\right) + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} \left(  (\tilde x^{(i)} - \mu_l)(\tilde x^{(i)} - \mu_l)^T\Sigma_l^{-1}\right)\\
+
+\left(\sum_{i=1}^m  w_l^{(i)}  + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\}\right)\Sigma_l 
+&=
+\sum_{i=1}^m  w_l^{(i)} \left(  (x^{(i)} - \mu_l)(x^{(i)} - \mu_l)^T\right) + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} \left(  (\tilde x^{(i)} - \mu_l)(\tilde x^{(i)} - \mu_l)^T\right)\\
+\Sigma_l &= \dfrac{\sum_{i=1}^m  w_l^{(i)} \left(  (x^{(i)} - \mu_l)(x^{(i)} - \mu_l)^T\right) + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} \left(  (\tilde x^{(i)} - \mu_l)(\tilde x^{(i)} - \mu_l)^T\right)}{\sum_{i=1}^m  w_l^{(i)}  + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\}}
+\end{aligned}
+$$
+in conclusion:
+$$
+\begin{aligned}
+\mu_l^{(t+1)} &= \dfrac{\sum_{i=1}^m w_l^{(i)}  x^{(i)} + \alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\} \tilde x^{(i)}}{\sum_{i=1}^m w_l^{(i)} +\alpha \sum_{i=1}^{\tilde m} 1\{\tilde z^{(i)}=l\}}\\
+\Sigma_l^{(t+1)} &= \dfrac{\sum_{i=1}^m  w_l^{(i)} \left(  (x^{(i)} - \mu_l)(x^{(i)} - \mu_l)^T\right) + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\} \left(  (\tilde x^{(i)} - \mu_l)(\tilde x^{(i)} - \mu_l)^T\right)}{\sum_{i=1}^m  w_l^{(i)}  + \alpha \sum_{i=1}^{\tilde m}  1\{\tilde z^{(i)}=l\}}\\
+\phi_j^{(t+1)} &= \dfrac{1}{m+\alpha\tilde m}\left(\sum_{i=1}^m{w_j^{(i)}}  +\alpha\sum_{i=1}^{\tilde m} {1\{\tilde z^{(i)}=j\}}\right)
+\end{aligned}
+$$
+
+### (f)
+
+i. unsupervised takes about 150 iterations to converge, which is slower than semi-supervised that takes about 25 iterations to converge.
+
+ii. unsupervised is very unstable, in different random initializations the assignments change a lot, while semi-supervised is very stable, the assignments don't change at all.
+
+iii. 
+
+unsupervised: low quality. it could split the high-variance distribution into two distributions or mix up two low-variance distributions.   
+semi-supervised: high qualily. it figured out the three low-variance distributions and the the high-variance distribution correctly.
+
+## Problem 5
+
+original: $512\times 512 \times 24 = 6,291,456\ \mathrm{ bits}$
+
+compressed(approximately): $512\times 512\times 4 = 1,048,576\ \mathrm{bits}$
+
+Compression Factor is approximately $\dfrac{1}{6}$

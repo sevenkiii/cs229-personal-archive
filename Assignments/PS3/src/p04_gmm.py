@@ -12,7 +12,7 @@ def main(is_semi_supervised, trial_num):
     """Problem 3: EM for Gaussian Mixture Models (unsupervised and semi-supervised)"""
     print('Running {} EM algorithm...'
           .format('semi-supervised' if is_semi_supervised else 'unsupervised'))
-
+    
     # Load dataset
     train_path = os.path.join('..', 'data', 'ds3_train.csv')
     x, z = load_gmm_dataset(train_path)
@@ -24,7 +24,6 @@ def main(is_semi_supervised, trial_num):
         x_tilde = x[labeled_idxs, :]   # Labeled examples
         z = z[labeled_idxs, :]         # Corresponding labels
         x = x[~labeled_idxs, :]        # Unlabeled examples
-
     # *** START CODE HERE ***
     # (1) Initialize mu and sigma by splitting the m data points uniformly at random
     # into K groups, then calculating the sample mean and covariance for each group
@@ -32,6 +31,18 @@ def main(is_semi_supervised, trial_num):
     # phi should be a numpy array of shape (K,)
     # (3) Initialize the w values to place equal probability on each Gaussian
     # w should be a numpy array of shape (m, K)
+    m = x.shape[0]
+    dim = x.shape[1]
+    phi = np.full(K, 1.0 / K)
+    w = np.full((m, K), 1.0 / K)
+    mu = np.zeros((K, dim))
+    sigma = np.zeros((K, dim, dim))
+    bel = np.random.randint(0, K, m) 
+    # bel[:4] = [0, 1, 2, 3] # Ensure no zero-member groups
+    for i in range(K):
+        mask = bel == i
+        mu[i] = np.sum(x[mask], axis=0) / np.sum(mask)
+        sigma[i] = ((x[mask] - mu[i]).T @ (x[mask] - mu[i])) / np.sum(mask)
     # *** END CODE HERE ***
 
     if is_semi_supervised:
@@ -73,17 +84,47 @@ def run_em(x, w, phi, mu, sigma):
     # See below for explanation of the convergence criterion
     it = 0
     ll = prev_ll = None
+    dim = x.shape[1]
     while it < max_iter and (prev_ll is None or np.abs(ll - prev_ll) >= eps):
         pass  # Just a placeholder for the starter code
         # *** START CODE HERE
+        prev_ll = ll
+        m = x.shape[0]
         # (1) E-step: Update your estimates in w
+        def calc(x, mu, sigma, phi):
+            return (1 / ((2 * np.pi) ** (x.shape[0] / 2) * np.sqrt(np.linalg.det(sigma))) * phi *
+                    np.exp(- 1 / 2 * (x - mu).T @ np.linalg.inv(sigma) @ (x - mu)))
+        for i in range(m):
+            demo = 0
+            for j in range(K):
+                demo += calc(x[i], mu[j], sigma[j], phi[j])
+            for j in range(K):
+                w[i][j] = calc(x[i], mu[j], sigma[j], phi[j]) / demo
         # (2) M-step: Update the model parameters phi, mu, and sigma
+        for i in range(K):
+            phi[i] = 1 / m * w[:, i].sum()
+            mu[i] = np.average(x, axis=0, weights=w[:, i])
+            sigma[i] = np.zeros((dim, dim))
+            for j in range(m):
+                sigma[i] += w[j][i] * np.outer(x[j] - mu[i], x[j] - mu[i])
+            sigma[i] /= w[:, i].sum()
         # (3) Compute the log-likelihood of the data to check for convergence.
         # By log-likelihood, we mean `ll = sum_x[log(sum_z[p(x|z) * p(z)])]`.
         # We define convergence by the first iteration where abs(ll - prev_ll) < eps.
         # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
+        ll = 0
+        for i in range(m):
+            prb = 0
+            for j in range(K):
+                prb += calc(x[i], mu[j], sigma[j], phi[j])
+            ll += np.log(prb)
+        it += 1
+        print("ITER ", it, end=" | ")
+        print("Now likelihood", ll, end=" | ")
+        if prev_ll is not None:
+            print("ERR ", np.abs(ll - prev_ll))
         # *** END CODE HERE ***
-
+    print("Iteration num: ", it)
     return w
 
 
@@ -110,7 +151,7 @@ def run_semi_supervised_em(x, x_tilde, z, w, phi, mu, sigma):
     alpha = 20.  # Weight for the labeled examples
     eps = 1e-3   # Convergence threshold
     max_iter = 1000
-
+    dim = x.shape[1]
     # Stop when the absolute change in log-likelihood is < eps
     # See below for explanation of the convergence criterion
     it = 0
@@ -118,11 +159,54 @@ def run_semi_supervised_em(x, x_tilde, z, w, phi, mu, sigma):
     while it < max_iter and (prev_ll is None or np.abs(ll - prev_ll) >= eps):
         pass  # Just a placeholder for the starter code
         # *** START CODE HERE ***
+        prev_ll = ll
+        m = x.shape[0]
+        m_tilde = x_tilde.shape[0]
         # (1) E-step: Update your estimates in w
+        def calc(x, mu, sigma, phi):
+            return (1 / ((2 * np.pi) ** (x.shape[0] / 2) * np.sqrt(np.linalg.det(sigma))) * phi *
+                    np.exp(- 1 / 2 * (x - mu).T @ np.linalg.inv(sigma) @ (x - mu)))
+        for i in range(m):
+            demo = 0
+            for j in range(K):
+                demo += calc(x[i], mu[j], sigma[j], phi[j])
+            for j in range(K):
+                w[i][j] = calc(x[i], mu[j], sigma[j], phi[j]) / demo
         # (2) M-step: Update the model parameters phi, mu, and sigma
+        for i in range(K):
+            phi[i] = 1 / (m + alpha * m_tilde) * (w[:, i].sum() + alpha * np.sum(z == i))
+            mu[i] = 0
+            sigma[i] = np.zeros((dim, dim))
+            for j in range(m):
+                mu[i] += w[j][i] * x[j]
+            for j in range(m_tilde):
+                if z[j] == i:
+                    mu[i] += alpha * x_tilde[j]
+            mu[i] /= w[:, i].sum() + alpha * np.sum(z == i)
+            
+            for j in range(m):
+                sigma[i] += w[j][i] * np.outer(x[j] - mu[i], x[j] - mu[i])
+            for j in range(m_tilde):
+                if z[j] == i:
+                    sigma[i] += alpha * np.outer(x_tilde[j] - mu[i], x_tilde[j] - mu[i])
+            sigma[i] /= w[:, i].sum() + alpha * np.sum(z == i)
+            
         # (3) Compute the log-likelihood of the data to check for convergence.
         # Hint: Make sure to include alpha in your calculation of ll.
         # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
+        ll = 0
+        for i in range(m):
+            prb = 0
+            for j in range(K):
+                prb += calc(x[i], mu[j], sigma[j], phi[j])
+            ll += np.log(prb)
+        for i in range(m_tilde):
+            ll += alpha * np.log(calc(x_tilde[i], mu[int(z[i])], sigma[int(z[i])], phi[int(z[i])]))
+        it += 1
+        print("ITER ", it, end=" | ")
+        print("Now likelihood", ll, end=" | ")
+        if prev_ll is not None:
+            print("ERR ", np.abs(ll - prev_ll))
         # *** END CODE HERE ***
 
     return w
@@ -197,5 +281,5 @@ if __name__ == '__main__':
         # Once you've implemented the semi-supervised version,
         # uncomment the following line.
         # You do not need to add any other lines in this code block.
-        # main(with_supervision=True, trial_num=t)
+        main(is_semi_supervised=True, trial_num=t)
         # *** END CODE HERE ***
